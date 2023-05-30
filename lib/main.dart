@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pvk_food_order_app/Test/Login.dart';
+import 'package:pvk_food_order_app/Confirm_order_page/Confrim_order.dart';
 import 'package:pvk_food_order_app/home/main_food_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.poppinsTextTheme(
             Theme.of(context).textTheme,
           )),
-      home: homeScreen(),
-      // home: Login(),
+      // home: const homeScreen(),
+      home: const homeScreen(),
     );
   }
 }

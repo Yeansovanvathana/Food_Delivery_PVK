@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:pvk_food_order_app/utils/color.dart';
+import 'package:pvk_food_order_app/utils/firestore.dart';
 import 'package:pvk_food_order_app/widgets/big_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+class ChooseAddress extends StatefulWidget {
+  final Function refresh;
+  const ChooseAddress({Key? key, required this.refresh}) : super(key: key);
 
-class ChooseAddress extends StatelessWidget {
-  const ChooseAddress({Key? key}) : super(key: key);
+  @override
+  State<ChooseAddress> createState() => _ChooseAddressState();
+}
+
+class _ChooseAddressState extends State<ChooseAddress> {
+  Future roomData = Firestore().getRoomType();
+
+  int _selectedMainLocationIndex = -1;
+  int _selectedRoomLocationIndex = -1;
+  String borey = '';
+  String broom = '';
+
+  Future<void> addItem(String key, String item) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(key, item);
+  }
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     return Container(
-      padding: const EdgeInsets.all(40),
-      height: 480,
+      padding: EdgeInsets.all(height / 24.625),
+      height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(50),
-          topRight: Radius.circular(50),
+          topLeft: Radius.circular(height / 19.7),
+          topRight: Radius.circular(height / 19.7),
         ),
         color: Colors.white,
       ),
@@ -23,115 +45,127 @@ class ChooseAddress extends StatelessWidget {
           Row(
             children: [
               BigText(text: "Choose address"),
-              Expanded(child: Container()),
-              Text(
-                "Cancle",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
+              const Spacer(),
+              InkWell(
+                onTap: () async {
+                  _selectedMainLocationIndex != -1 &&
+                          _selectedRoomLocationIndex != -1
+                      ? {
+                          await addItem("borey", borey),
+                          await addItem("room", broom),
+                          await widget.refresh(),
+                          Navigator.pop(context),
+                        }
+                      : setState(() {
+                          _selectedMainLocationIndex = -1;
+                          _selectedRoomLocationIndex = -1;
+                          borey = '';
+                          broom = '';
+                        });
+                  print("$borey  $broom");
+                },
+                child: const Text(
+                  "Done",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100),
+                ),
               )
             ],
           ),
-          SizedBox(height: 40),
-          Container(
-            child: Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                        width: 100,
-                        height: 60,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: AppColors.lightGreen),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              BigText(
-                                text: "Borey R",
-                              ),
-                            ])),
-                    Container(
-                        width: 100,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        // color: AppColors.lightGreen),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              BigText(
-                                text: "Borey M",
-                              ),
-                            ])),
-                    Container(
-                        width: 100,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        // color: AppColors.lightGreen),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              BigText(
-                                text: "Borey V",
-                              ),
-                            ])
-                        // BigText(text: "Borey M"),
+          SizedBox(height: height / 21.88),
+          Expanded(
+            child: Container(
+              // padding: const EdgeInsets.only(top: 10),
+              // margin: const EdgeInsets.only(left: 30, right: 30),
+              child: FutureBuilder(
+                future: roomData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
 
+                  if (snapshot.hasError) {
+                    return const Text("Loading...");
+                  }
+                  var data = snapshot.data as List<Map<String, dynamic>>;
+                  // var data = snapshot.data as Map<String, dynamic>;
+                  if (data.isNotEmpty) {
+                    var rooms = data[_selectedMainLocationIndex != -1
+                        ? _selectedMainLocationIndex
+                        : 0]['ListRoomNum'];
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: data.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                //borey = data[index]["name"];
+                                final isSelected =
+                                    _selectedMainLocationIndex == index;
+                                return InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedMainLocationIndex = index;
+                                      _selectedRoomLocationIndex = -1;
+                                    });
+                                    borey = data[index]["name"];
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: isSelected ? Colors.grey : null,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    height: 20,
+                                    child: Text(
+                                      data[index]["name"],
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    // child: Text(data["ListRoomNum"][index], textAlign: TextAlign.center,),
+                                    // color: Colors.blue,
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                  ),
+                                );
+                              }),
                         ),
-                  ],
-                ),
-                Expanded(child: Container()),
-                Container(
-                  padding: const EdgeInsets.all(30),
-                  height: 310,
-                  width: 200,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.lightGreen),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Text(
-                              "J01",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Expanded(child: Container()),
-                            Icon(Icons.check)
-                          ],
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: rooms.length,
+                            itemBuilder: (context, index) {
+                              var room = rooms[index];
+                              //broom = room;
+                              var isSelected =
+                                  _selectedRoomLocationIndex == index;
+
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedRoomLocationIndex = index;
+                                  });
+                                  broom = rooms[index];
+                                },
+                                child: Container(
+                                  child: Text(room),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.grey : null,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "J01",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "J02",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "J03",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        "J04",
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                )
-              ],
+                      ],
+                    );
+                  }
+                  return const Text("No data");
+                },
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

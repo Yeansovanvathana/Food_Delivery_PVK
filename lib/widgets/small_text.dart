@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/cupertino.dart';
 
 class SmallText extends StatelessWidget {
@@ -11,7 +13,8 @@ class SmallText extends StatelessWidget {
         this.color,
         required this.text,
         this.size = 14,
-        this.height=1.2})
+        this.height=1.2
+      })
       : super(key: key);
 
   @override

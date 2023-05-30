@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:pvk_food_order_app/utils/color.dart';
-import 'package:pvk_food_order_app/widgets/small_text.dart';
 
 class IconAndText extends StatelessWidget {
   final double? size;
@@ -8,7 +6,7 @@ class IconAndText extends StatelessWidget {
   final IconData icon;
   final String text;
   final Color iconColor;
-  const IconAndText({Key? key, required this.icon,required this.text,required this.iconColor, this.textColor, this.size}) : super(key: key);
+  const IconAndText({Key? key, required this.icon,required this.text, required this.iconColor, this.textColor, this.size= 16}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +14,7 @@ class IconAndText extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Icon(icon, color: iconColor,),
-        SizedBox(width: 5,),
+        const SizedBox(width: 5,),
         Text(text,
           style: TextStyle(
               color: textColor,

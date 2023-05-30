@@ -10,6 +10,6 @@ class favoritePage extends StatefulWidget {
 class _favoritePageState extends State<favoritePage> {
   @override
   Widget build(BuildContext context) {
-    return Text("Favorite Page");
+    return const Text("Favorite Page");
   }
 }

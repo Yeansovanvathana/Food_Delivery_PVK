@@ -8,7 +8,7 @@ class Empty extends StatelessWidget {
   final Function navigateTo;
 
   const Empty({Key? key, required this.navigateTo}) : super(key: key);
-  //This for Empty Cart when no customer select
+  //This for Empty Cart 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;

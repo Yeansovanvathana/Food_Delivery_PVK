@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/color.dart';
 import '../widgets/big_text.dart';
 import 'item_in_cart.dart';
-
+// this cart has items
 class HasItem extends StatefulWidget {
   final Function(List<String>) addToCart;
   final Function navigateTo;
